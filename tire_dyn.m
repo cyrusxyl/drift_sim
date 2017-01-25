@@ -1,11 +1,21 @@
-function [Fx,Fy] = tire_dyn(K, mu, Fz, C_x, C_alpha, alpha)
+function [Fx,Fy] = tire_dyn(Ux, Ux_cmd, mu, Fz, C_x, C_alpha, alpha)
 %#codegen
-    if K == -1
-        K = -0.99;
-    elseif abs(K) == Inf
-        Fx = sign(K)*mu*Fz;
+    % longitude wheel slip
+    if (Ux_cmd == Ux)
+        K = 0;
+    elseif Ux == 0
+        Fx = sign(Ux_cmd)*mu*Fz;
         Fy = 0;
         return;
+    else
+        K = (Ux_cmd-Ux)/abs(Ux);
+    end
+    
+    % instead of avoiding -1, now look for positive equivalent
+    reverse = 1;
+    if K < 0
+        reverse = -1;
+        K = abs(K);
     end
     
     % alpha > pi/2 cannot be adapted to this formula
@@ -19,6 +29,8 @@ function [Fx,Fy] = tire_dyn(K, mu, Fz, C_x, C_alpha, alpha)
     if gamma <= 3*mu*Fz
         F = gamma - 1/(3*mu*Fz)*gamma^2 + 1/(27*mu^2*Fz^2)*gamma^3;
     else
+        % more accurate modeling with peak friction value
+        % F = (mu*0.9 + (0.1*mu)/(1 + ((gamma-3*mu*Fz)/9)^2))*Fz;
         F = mu*Fz;
     end
     
@@ -26,7 +38,7 @@ function [Fx,Fy] = tire_dyn(K, mu, Fz, C_x, C_alpha, alpha)
         Fx = 0;
         Fy = 0;
     else
-        Fx = C_x/gamma * (K/(1+K)) * F;
+        Fx = C_x/gamma * (K/(1+K)) * F * reverse;
         Fy = -C_alpha/gamma * (tan(alpha)/(1+K)) * F;
     end
 end

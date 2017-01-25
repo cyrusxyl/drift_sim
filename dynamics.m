@@ -15,7 +15,7 @@ b = 0.1221;         % CoG to rear axle
 mu = 0.37;          % friction coeffcient
 C_alpha = 120000;   % laternal stiffness
 C_x = 120000;       % longitude stiffness
-Iz = 0.020899525;   % roatation inertia
+Iz = 0.05; %0.020899525;   % roatation inertia
 g = 9.81;     
 G_front = m*g*(a/L);% calculated load or specify front rear load directly
 G_rear = m*g*(b/L);
@@ -37,13 +37,6 @@ delta = u(2);
 % ----------------------------------------
 % --------------Tire Dyanmics-------------
 % ----------------------------------------
-% longitude wheel slip K
-if Ux_cmd == Ux
-    K = 0;
-else
-    K = (Ux_cmd-Ux)/abs(Ux);
-end
-
 % lateral slip angle alpha
 if Ux == 0 && Uy == 0   % vehicle is still no slip
     alpha_F = 0;
@@ -63,8 +56,8 @@ end
 alpha_F = wrapToPi(alpha_F);
 alpha_R = wrapToPi(alpha_R);
 
-[Fxf,Fyf] = tire_dyn(0, mu, G_front, C_x, C_alpha, alpha_F);
-[Fxr,Fyr] = tire_dyn(K, mu, G_rear, C_x, C_alpha, alpha_R);
+[Fxf,Fyf] = tire_dyn(Ux, Ux, mu, G_front, C_x, C_alpha, alpha_F);
+[Fxr,Fyr] = tire_dyn(Ux, Ux_cmd, mu, G_rear, C_x, C_alpha, alpha_R);
 
 
 % ----------------------------------------

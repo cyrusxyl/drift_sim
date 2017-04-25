@@ -1,12 +1,3 @@
-% Cyrus Liu
-% the Robotics Institute, Carnegie Mellon University
-% 01/22/2017
-
-% Vehicle Drifting Dynamics Simulation
-
-% ----------------------------------------
-% --------Initialize Visualization--------
-% ----------------------------------------
 show_traj_cog = 1;
 show_traj_r = 1;
 show_wheels = 1;
@@ -14,12 +5,12 @@ show_wheels = 1;
 figure(1)
 P = [-0.15  -0.15  0.15  0.15  -0.15; -0.08  0.08  0.08  -0.08  -0.08; 1 1 1 1 1];
 W = [-0.03  -0.03  0.03  0.03  -0.03; -0.015  0.015  0.015  -0.015  -0.015; 1 1 1 1 1];
-CoG = [0;0;1]
-r_axle = [-0.15;0;1]
+CoG = [0;0;1];
+r_axle = [-0.15;0;1];
 h = animatedline(P(1,:),P(2,:));
 
 if show_traj_cog
-    traj_cog = animatedline(CoG(1,:),CoG(2,:),'Color','g');
+    traj_cog = animatedline(CoG(1,:),CoG(2,:),'Color','b','linewidth',2);
 end
 
 if show_traj_r
@@ -28,26 +19,27 @@ end
 
 if show_wheels
     tfr = [1 0 0.135; 0 1 -0.08; 0 0 1]*W;
-    fr = animatedline(tfr(1,:),tfr(2,:))
+    fr = animatedline(tfr(1,:),tfr(2,:));
     tfl = [1 0 0.135; 0 1 0.08; 0 0 1]*W;
-    fl = animatedline(tfl(1,:),tfl(2,:))
+    fl = animatedline(tfl(1,:),tfl(2,:));
     trr = [1 0 -0.135; 0 1 -0.08; 0 0 1]*W;
-    rr = animatedline(trr(1,:),trr(2,:))
+    rr = animatedline(trr(1,:),trr(2,:));
     trl = [1 0 -0.135; 0 1 0.08; 0 0 1]*W;
-    rl = animatedline(trl(1,:),trl(2,:))
+    rl = animatedline(trl(1,:),trl(2,:));
 end
-axis([-2, 2, -2, 2])
-axis equal
+axis([-1,2,-1,2])
+axis equal 'auto xy'
 
 % --------Initialize Joystick--------
-joy = vrjoystick(1)
-x = [0,0,0,0,0,0];
-dt = 0.03;
-
+x = [0;0;0;0;0;0];
+dt = 0.025;
+T = 5.5;
 throttle = 0;
 steer = 0;
 
-while ~button(joy,2)     
+traj = zeros(T/dt+1,2);
+i = 1;
+for t = 0:dt:T    
     % ----------------------------------------
     % ----------Update Visualization----------
     % ----------------------------------------
@@ -86,14 +78,14 @@ while ~button(joy,2)
     drawnow
     
     % --------Use Joystick Input--------
-    throttle = max(-0.5,-2*axis(joy,4));
-    steer = -1*axis(joy,1);
-    if button(joy,1)
-        pause()   
-    end 
+    throttle = 3;
+    steer = t*0.76/5;
     
     % ------Calculate Car Dynamics------
-    u = [throttle, steer];
+    u = [throttle; steer];
     new_x = dynamics_finite(x, u, dt);
     x = new_x;
+    
+    traj(i,:) = double(x(1:2));
+    i = i+1;
 end

@@ -23,11 +23,11 @@ G_rear = m*g*a/L;
 % mu = 5.2/G_rear;   
 % mu_spin = 4.3/G_rear; 
 
-C_x = 45;          % longitude stiffness
-C_alpha = 45;      % laternal stiffness
+C_x = 116;          % longitude stiffness
+C_alpha = 197;      % laternal stiffness
 Iz = 0.045; % roatation inertia
-mu = 0.75;   
-mu_spin = 0.20; 
+mu = 1.31;   
+mu_spin = 0.55; 
 
 % ----------------------------------------
 % ------States/Inputs Interpretation------
@@ -54,8 +54,8 @@ elseif Ux == 0      % perfect side slip
     alpha_F = pi/2*sign(Uy)-delta;
     alpha_R = pi/2*sign(Uy);
 elseif Ux < 0    % rare ken block situations
-    alpha_F = (sign(Uy)*pi)-atan((Uy+a*r)/abs(Ux))-delta;
-    alpha_R = (sign(Uy)*pi)-atan((Uy-b*r)/abs(Ux));
+    alpha_F = atan((Uy+a*r)/abs(Ux))+delta;
+    alpha_R = atan((Uy-b*r)/abs(Ux));
 else                % normal situation
     alpha_F = atan((Uy+a*r)/abs(Ux))-delta;
     alpha_R = atan((Uy-b*r)/abs(Ux));

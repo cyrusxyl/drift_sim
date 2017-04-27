@@ -32,4 +32,4 @@ if show_wheels
 end
 
 axis([-2, 2, -2, 2])
-axis equal auto
+axis equal
